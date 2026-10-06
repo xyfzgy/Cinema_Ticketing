@@ -1,0 +1,15 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { fetchMovies, posterFor } from '@/api/discovery'
+import PageBack from '@/components/PageBack.vue'
+import ContentState from '@/components/ContentState.vue'
+const router = useRouter(), movies = ref([]), loading = ref(true), sort = ref('综合')
+const ranked = computed(() => [...movies.value].sort((a,b) => sort.value === '播放次数' ? b.count-a.count : sort.value === '评分' ? b.score-a.score : (b.score*100+b.count/100)-(a.score*100+a.count/100)))
+onMounted(async()=>{try{movies.value=await fetchMovies()}catch{movies.value=[]}finally{loading.value=false}})
+</script>
+<template><main class="cinema-page"><div class="content-wrap"><PageBack/><header class="page-header"><span>FILM CHART</span><h1>电影排行榜</h1><p>看看大家最近都在看什么</p></header><div class="white-surface"><div class="ranking-tools"><h2>热门榜单</h2><el-segmented v-model="sort" :options="['综合','评分','播放次数']" /></div><ContentState :loading="loading" :empty="!loading&&!ranked.length" label="暂无排行数据"/><div v-for="(movie,index) in ranked" :key="movie.id" class="rank-row" @click="router.push(`/movieDetail?id=${movie.id}&name=${encodeURIComponent(movie.name)}`)"><span class="rank-number" :class="`top-${index+1}`">{{ String(index+1).padStart(2,'0') }}</span><img :src="posterFor(movie)" :alt="movie.name"/><div class="rank-title"><strong>{{ movie.name }}</strong><span>{{ movie.type || '类型待更新' }}</span></div><div class="rank-meta"><b>★ {{ movie.score ? movie.score.toFixed(1) : '暂无' }}</b><span>{{ (movie.count||0).toLocaleString() }} 次播放</span></div><span class="row-arrow">›</span></div></div></div></main></template>
+<style scoped>.cinema-page{min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2 60%,#87ceeb);padding:25px 16px 70px}.content-wrap{max-width:1080px;margin:auto}.page-header{color:white;padding:28px 0 20px}.page-header span{font-size:12px;letter-spacing:1px}.page-header h1{font-size:32px;margin:8px 0}.page-header p{opacity:.85}.white-surface{background:white;border-radius:10px;padding:26px;box-shadow:0 12px 36px #28205a25}.ranking-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.ranking-tools h2{font-size:20px}.rank-row{display:flex;align-items:center;gap:20px;padding:14px 0;border-bottom:1px solid #eee;cursor:pointer}.rank-row:hover{background:#faf9ff}.rank-number{width:45px;font-size:24px;color:#aab;font-weight:800}.top-1{color:#e7ab25}.top-2{color:#8399b5}.top-3{color:#c68b68}.rank-row img{width:64px;height:88px;object-fit:cover;border-radius:5px;background:#eee}.rank-title{display:grid;gap:7px;flex:1}.rank-title strong{color:#333}.rank-title span,.rank-meta span{font-size:13px;color:#999}.rank-meta{display:grid;gap:8px;text-align:right}.rank-meta b{color:#dba800}.row-arrow{color:#999;font-size:24px}@media(max-width:600px){.white-surface{padding:16px}.rank-row{gap:10px}.rank-number{width:32px;font-size:19px}.rank-row img{width:52px;height:72px}.ranking-tools{align-items:start;flex-direction:column}}</style>
+
+
+

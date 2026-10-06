@@ -1,0 +1,2 @@
+<template><main class="not-found"><div><strong>404</strong><h1>页面未找到</h1><p>你寻找的页面可能已经换了位置。</p><el-button type="primary" @click="$router.push('/index')">返回首页</el-button></div></main></template>
+<style scoped>.not-found{min-height:100vh;display:grid;place-items:center;text-align:center;background:linear-gradient(135deg,#667eea,#764ba2 65%,#87ceeb);color:white}.not-found strong{font-size:100px}.not-found h1{font-size:30px}.not-found p{opacity:.8}.not-found :deep(.el-button){background:white;color:#664ca9;border:0}</style>
